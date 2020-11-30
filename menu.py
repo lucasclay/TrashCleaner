@@ -32,24 +32,22 @@ print(width, height)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 surface = pygame.Surface((width,height), pygame.SRCALPHA)
 
-def fullscreen_on(screen):
-    if fullscreen_on.full:
-        screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.FULLSCREEN)
-    fullscreen_on.full = not fullscreen_on.full
-    return screen
-fullscreen_on.full = False
+
+screenfull = 1
 
 def fullscreen_off(screen):
-    fullscreen_off.full = not fullscreen_off.full
-    if fullscreen_off.full:
-        screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    global screenfull
+    screenfull = 1
     return screen
-fullscreen_off.full = False
+
+def fullscreen_on(screen):
+    screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.FULLSCREEN)
+    global screenfull
+    screenfull = 2
+    return screen
 
 # Iniciando imagens, sons e fontes e arquivos
-
-
 invissible = (0, 0, 0, 0)
 cor = (0, 255, 0, 255)
 
@@ -58,8 +56,6 @@ LIXOVELOCIDADE = 100
 titulo = pygame.image.load('imagens/menu/titulo.png')
 titulo = pygame.transform.scale(titulo, [410, 180])
 fundo = pygame.image.load('imagens/menu/fundo.png')
-if screen == 1366:
-    fundo = pygame.transform.scale(fundo, [1366, 768])
 
 jogar = pygame.image.load('imagens/menu/play.png')
 jogar_alt = pygame.image.load('imagens/menu/playalt.png')
@@ -166,12 +162,9 @@ gameover_sair_alt = pygame.image.load('imagens/game over/sairalt.png')
 #passos = pygame.mixer.Sound('Sons/passos.wav')
 
 clip = VideoFileClip('imagens/intro.mp4')
-#clip.preview()
+clip.preview()
 
 creditos = VideoFileClip('imagens/creditos.mp4')
-#creditos = pygame.transform.scale(creditos, [980, 720])
-
-n = 10
 
 def game(n=10):
     jogo(n)
@@ -240,7 +233,12 @@ def menu():
         if 550 + 223 > mouse[0] > 550 and 630 + 65 > mouse[1] > 630:
             screen.blit(cred_alt, (550,630))
             if press:
-                creditos.preview()
+                if screenfull == 1:
+                    print('1')
+                    creditos.preview()
+                else:
+                    print('2')
+                    creditos.preview(fullscreen=True)
                 menu()
 
         else:
@@ -362,6 +360,7 @@ def conf():
             screen.blit(seleçao, (603, 392))
             if press[0]:
                 fullscreen_on(screen)
+                #screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.FULLSCREEN)
                 conf()
                 for u in range(0, 10):
                     screen.blit(full, (601, 390))
