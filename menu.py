@@ -40,9 +40,10 @@ def fullscreen_on(screen):
 fullscreen_on.full = False
 
 def fullscreen_off(screen):
+    fullscreen_off.full = not fullscreen_off.full
     if fullscreen_off.full:
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    fullscreen_off.full = not fullscreen_off.full
+    
     return screen
 fullscreen_off.full = False
 
@@ -560,7 +561,7 @@ def jogo(n):
     
     # objetos
     pontos = 0
-    lixomochila = 500
+    lixomochila = 0
     timer = 0
     contagem = 60
     t = 2
