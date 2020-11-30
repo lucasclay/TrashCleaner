@@ -4,10 +4,12 @@ from moviepy.editor import *
 
 from catador import Carro
 from player import Player
+from player import Lançar
 from lixos import LixoL
 from lixos import LixoR
 from lixos import tiro
 from time import sleep
+import lixos
 
 
 import math
@@ -28,13 +30,29 @@ height = tela.current_h -48
 print(width, height)
 #screen = pygame.display.set_mode((tela.current_w, tela.current_h -25)), pygame.FULLSCREEN
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+surface = pygame.Surface((width,height), pygame.SRCALPHA)
 
+def fullscreen_on(screen):
+    if fullscreen_on.full:
+        screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.FULLSCREEN)
+    fullscreen_on.full = not fullscreen_on.full
+    return screen
+fullscreen_on.full = False
+
+def fullscreen_off(screen):
+    if fullscreen_off.full:
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    fullscreen_off.full = not fullscreen_off.full
+    return screen
+fullscreen_off.full = False
 
 # Iniciando imagens, sons e fontes e arquivos
 
 
 invissible = (0, 0, 0, 0)
-cor = (0, 255, 0, 0)
+cor = (0, 255, 0, 255)
+
+LIXOVELOCIDADE = 100
 
 titulo = pygame.image.load('imagens/menu/titulo.png')
 titulo = pygame.transform.scale(titulo, [410, 180])
@@ -151,6 +169,12 @@ clip = VideoFileClip('imagens/intro.mp4')
 
 creditos = VideoFileClip('imagens/creditos.mp4')
 #creditos = pygame.transform.scale(creditos, [980, 720])
+
+n = 10
+
+def game(n=10):
+    jogo(n)
+
 font_name = pygame.font.match_font('berlin sans FB', True, True)
 def text(surf, text, size, x, y, cor): 
     font = pygame.font.Font(font_name, size)
@@ -160,26 +184,16 @@ def text(surf, text, size, x, y, cor):
     surf.blit(text_surface, text_rect)
 
 def menu():
-    
-    a = 290
-    b = 0
+
     # Coloca as imagens
     screen.blit(fundo, (0, 0))
-    screen.blit(titulo, (a, b))
-    screen.blit(jogar, (390, 350))
-    screen.blit(sair, (680, 370))
-    screen.blit(config, (150, 370))
-    screen.blit(guide, (250,630))
-    screen.blit(cred, (550,630))
+    screen.blit(titulo, (290, 0))
 
     pygame.display.flip()
 
     menu_music.stop()
     jogo_music.stop()
     menu_music.play()
-    
-
-    # Eventos clicáveis do Menu
 
     while pygame.event.wait() or pygame.event.get():
 
@@ -189,10 +203,9 @@ def menu():
         #JOGAR
         if math.sqrt(((mouse[0] - 500)**2) + ((mouse[1] - 460)**2)) < 110:
             screen.blit(jogar_alt, (390, 350))
-            a -= 290
             if press:
                 click_music.play()
-                jogo()
+                game(n)
         else:
             screen.blit(jogar, (390, 350))
 
@@ -253,6 +266,7 @@ def conf():
 
     #colocando na tela
     screen.blit(fundo_conf, (0, 0))
+    pygame.draw.circle(surface, (0, 0, 0, 10), [100, 100], 7)
 
     #audio
     screen.blit(sfx_titulo, (200, 70))
@@ -269,8 +283,8 @@ def conf():
 
     #video
     screen.blit(video_titulo, (670, 250))
-    screen.blit(full, (600, 355))
-    screen.blit(janela, (600, 390))
+    screen.blit(janela, (600, 355))
+    screen.blit(full, (601, 390))
 
     #dificuldade
     screen.blit(dificuldade_titulo, (100, 350))
@@ -281,9 +295,7 @@ def conf():
     screen.blit(aplicar, (width -320, height -90))
     screen.blit(fechar, (width -140, height -90))
 
-    myfont = pygame.font.SysFont("monospace", 50)
-
-    #volu = myfont.render(f'{ef_txt}', 1, (0,255,0))
+    
 
     while pygame.event.wait() or pygame.event.get():
     #while True:
@@ -291,11 +303,11 @@ def conf():
         #clock.tick(fps_conf)
         
         mouse = pygame.mouse.get_pos()
-        press = pygame.mouse.get_pressed()[0]
+        press = pygame.mouse.get_pressed()
 
         #CONTROLE DE VOLUME
         if 300 + 62 > mouse[0] > 300 and 150 + 35 > mouse[1] > 150:
-            if press:
+            if press[0]:
                 screen.blit(sfx_click, (300, 150))
                 vol_ef -= 0.1
                 ef_txt -= 1
@@ -305,7 +317,7 @@ def conf():
                 screen.blit(sfx_botao[0], (300, 150))
 
         if 382 + 62 > mouse[0] > 382 and 150 + 35 > mouse[1] > 150:
-            if press:
+            if press[0]:
                 screen.blit(sfx_click, (382, 150))
                 vol_ef += 0.1
                 ef_txt += 1
@@ -315,7 +327,7 @@ def conf():
                 screen.blit(sfx_botao[1], (382, 150))
         
         if 300 + 62 > mouse[0] > 300 and 200 + 35 > mouse[1] > 200:
-            if press:
+            if press[0]:
                 screen.blit(sfx_click, (300, 200))
                 vol_music -= 0.1
                 music_txt -= 1
@@ -324,7 +336,7 @@ def conf():
                 screen.blit(sfx_botao[0], (300, 200))
 
         if 382 + 62 > mouse[0] > 382 and 200 + 35 > mouse[1] > 200:
-            if press:
+            if press[0]:
                 screen.blit(sfx_click, (382, 200))
                 vol_music += 0.1
                 music_txt += 1
@@ -332,10 +344,65 @@ def conf():
             else:
                 screen.blit(sfx_botao[1], (382, 200))
 
+        #DISPLAY
+        #JANELA
+        if 600 + 182 > mouse[0] > 600 and 355 + 25 > mouse[1] > 355:
+            screen.blit(seleçao, (603, 358))
+            if press[0]:
+                fullscreen_off(screen)
+                conf()
+                for u in range(0, 10):
+                    screen.blit(janela, (600, 355))
+        else:
+            screen.blit(surface, (603-91, 357-90))
+
+        #FULLSCREEN
+        if 601 + 164 > mouse[0] > 601 and 390 + 23 > mouse[1] > 390:
+            screen.blit(seleçao, (603, 392))
+            if press[0]:
+                fullscreen_on(screen)
+                conf()
+                for u in range(0, 10):
+                    screen.blit(full, (601, 390))
+        else:
+            screen.blit(surface, (603-91, 392-90))
+        #DIFICULDADE
+        #FACIL
+        if 100 + 90 > mouse[0] > 100 and 450 + 25 > mouse[1] > 450:
+            screen.blit(seleçao, (100, 454))
+            if press[0]:
+                faci()
+                for u in range(0, 10):
+                    screen.blit(facil, (100, 450))
+        else:
+            screen.blit(surface, (100-91, 454-90))
+        
+        #MEDIO
+        if 100 + 100 > mouse[0] > 100 and 485 + 23 > mouse[1] > 485:
+            screen.blit(seleçao, (100, 489))
+            if press[0]:
+                medi()
+                for u in range(0, 10):
+                    screen.blit(medio, (100, 485))
+        else:
+            screen.blit(surface, (100-91, 489-90))
+            
+
+        #DIFICIL
+        if 100 + 100 > mouse[0] > 100 and 520 + 24 > mouse[1] > 520:
+            screen.blit(seleçao, (100, 524))
+            if press[0]:
+                difi()
+                for u in range(0, 10):
+                    screen.blit(dificil, (100, 520))
+        else:
+            screen.blit(surface, (100-91, 524-90))
+            
+
         #APLICAR E SAIR
         if (width-320) + 169 > mouse[0] > (width-320) and (height-90) + 58 > mouse[1] > (height-90):
             screen.blit(aplicar_alt, (width -318, height -87))
-            if press:
+            if press[0]:
                 vol()
                 pygame.display.update()
         else:
@@ -343,14 +410,11 @@ def conf():
 
         if (width-140) + 105 > mouse[0] > (width-140) and (height-90) + 55 > mouse[1] > (height-90):
             screen.blit(fechar_alt, (width -139, height -88))
-            if press:
+            if press[0]:
                 menu() 
 
         else:
             screen.blit(fechar, (width -140, height -90))
-
-
-        #volu = myfont.render(f'{ef_txt}', 1, (0,255,0))
 
 
         if ef_txt == 1:
@@ -477,15 +541,32 @@ def game_over():
             
         pygame.display.flip()
 
-def jogo():
+def faci():
+    lixos.LIXOVELOCIDADE = 10
+    global n
+    n = 10
+
+def medi():
+    lixos.LIXOVELOCIDADE = 30
+    global n
+    n = 30
+
+def difi():
+    lixos.LIXOVELOCIDADE = 60
+    global n
+    n = 60
+
+def jogo(n):
     
     # objetos
     pontos = 0
-    lixomochila = 0
+    lixomochila = 500
     timer = 0
     contagem = 60
     t = 2
     fps = 30
+    j = 0
+    x = 8
 
     objectGroup = pygame.sprite.Group()
 
@@ -503,6 +584,8 @@ def jogo():
     #lixoR = LixoR()
     #Lixo_group.add(lixoL)
     #Lixo_group.add(lixoR)
+
+    
 
     Player_group = pygame.sprite.Group()
     player = Player()
@@ -532,18 +615,23 @@ def jogo():
     menu_music.stop()
     jogo_music.play()
 
+    #game = dificul()
+    
+    #def val(vil=10):
+        #vel = vil
+        #return vel
+
+    val = n
     clock = pygame.time.Clock()
     tela = True
     while tela:
-        
         clock.tick(fps)
         # Faz o Fundo continuar infinito
         bg_y1 = bg_y % bg.get_height()
-        bg_y += 10
+        bg_y += val
 
         screen.blit(bg, (0, bg_y1 - bg.get_height()))
 
-        
         if bg_y1 < HEIGHT:
             screen.blit(bg, (0, bg_y1))
         for event in pygame.event.get():
@@ -552,16 +640,26 @@ def jogo():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     menu()
-                
                 if t > 20:
                     if event.key == pygame.K_SPACE:
                         t = 0
+                        #x = 12
+                        #j = 8
                         atirar = tiro(objectGroup, tiro_group)
+                        #player.image = pygame.image.load('Imagens/sprite/l1.png')
+                        #player.current_image = (j + 1) % 12
+
                         if lixomochila >= 1:
                             atirar.rect.center = player.rect.center
                             lixomochila -= 1
+                            #player.current_image = 0
                             jogar_saco.stop()
                             jogar_saco.play()
+
+                        #if t >= 4:
+                            #j = 0
+                            #x = 8
+
         t += 1
         timer += 1
         if timer == fps:
@@ -590,7 +688,7 @@ def jogo():
 
         objectGroup.draw(screen)
 
-        Player_group.update()
+        Player_group.update(j, x)
         Player_group.draw(screen)
 
         Carro_group.update()

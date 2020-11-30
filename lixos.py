@@ -47,6 +47,7 @@ class LixoR(pygame.sprite.Sprite):
         self.rect.y += LIXOVELOCIDADE
         if self.rect.bottom > 750:
             self.kill()
+
 class tiro(pygame.sprite.Sprite):
     def __init__(self, *groups):
         super().__init__(*groups)
@@ -59,7 +60,8 @@ class tiro(pygame.sprite.Sprite):
         self.current_image = randint(0, 4)
         self.image = pygame.image.load('Imagens/jogo/Lixo1.png')
         self.image = pygame.transform.scale(self.image, [69, 146])
-        self.rect = pygame.Rect(130, randint(-150, 0), 0, 0)
+        self.rect = pygame.Rect(0, 10, 100, 0)
+        
     def update(self, *args):
         self.image = self.images[self.current_image]
         self.rect.y -= 28
