@@ -9,11 +9,12 @@ class Carro(pygame.sprite.Sprite):
         self.image = pygame.image.load('Imagens/jogo/caminhãodelixo.png')
         self.image = pygame.transform.scale(self.image, [140, 330])
         self.rect = pygame.Rect(440, -150, 100, 320)
+        
         self.timer = 0
 
     def update(self, *args):
         self.timer += 0.06
-        self.rect.x = 35
+        #self.rect.x = 35
 
         self.rect.x = 425 + math.sin(self.timer) * 225
 

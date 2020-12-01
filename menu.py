@@ -1,4 +1,7 @@
 import pygame
+from tkinter import *
+from tkinter import messagebox
+
 from moviepy.editor import *
 #import shelve
 
@@ -8,8 +11,10 @@ from player import Lançar
 from lixos import LixoL
 from lixos import LixoR
 from lixos import tiro
+from buraco import buracos
 from time import sleep
 import lixos
+import buraco
 
 
 import math
@@ -21,6 +26,7 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 WIDTH = 980
 HEIGHT = 720
+
 
 pygame.init()
 pygame.display.set_caption("Trash Cleaner")
@@ -81,11 +87,14 @@ botao = [jogar, jogar_alt, sair, sair_alt]
 #MUSICAS
 menu_music = pygame.mixer.Sound('Sons/menu.ogg')
 jogo_music = pygame.mixer.Sound('Sons/jogo.ogg')
+hard_music = pygame.mixer.Sound('Sons/hard.wav')
 jogar_saco = pygame.mixer.Sound('Sons/jogar o saco.wav')
 click_music = pygame.mixer.Sound('Sons/click.ogg')
 
 menu_music.set_volume(0.5)
 jogo_music.set_volume(0.5)
+hard_music.set_volume(0.5)
+
 jogar_saco.set_volume(0.5)
 click_music.set_volume(0.5)
 
@@ -166,8 +175,10 @@ clip.preview()
 
 creditos = VideoFileClip('imagens/creditos.mp4')
 
-def game(n=10):
-    jogo(n)
+n = 10
+b = 10
+def game(n=10, b=0):
+    jogo(n, b)
 
 font_name = pygame.font.match_font('berlin sans FB', True, True)
 def text(surf, text, size, x, y, cor): 
@@ -187,6 +198,7 @@ def menu():
 
     menu_music.stop()
     jogo_music.stop()
+    hard_music.stop()
     menu_music.play()
 
     while pygame.event.wait() or pygame.event.get():
@@ -199,7 +211,7 @@ def menu():
             screen.blit(jogar_alt, (390, 350))
             if press:
                 click_music.play()
-                game(n)
+                game(n, b)
         else:
             screen.blit(jogar, (390, 350))
 
@@ -309,8 +321,7 @@ def conf():
             if press[0]:
                 screen.blit(sfx_click, (300, 150))
                 vol_ef -= 0.1
-                ef_txt -= 1
-               
+                ef_txt -= 1               
                 print (vol_ef)
             else:
                 screen.blit(sfx_botao[0], (300, 150))
@@ -415,19 +426,6 @@ def conf():
 
         else:
             screen.blit(fechar, (width -140, height -90))
-
-
-        if ef_txt == 1:
-            text(screen, f"{1}", 50, 480, 135, cor)
-        elif ef_txt == 2:
-            text(screen, f"{2}", 50, 480, 135, cor)
-        elif ef_txt == 3:
-            text(screen, f"{3}", 50, 480, 135, cor)
-        elif ef_txt == 4:
-            text(screen, f"{4}", 50, 480, 135, cor)
-            pygame.display.flip()
-        elif ef_txt == 5:
-            text(screen, f"{5}", 50, 480, 135, cor)
     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -436,15 +434,39 @@ def conf():
                 if event.key == pygame.K_ESCAPE:
                     menu()
 
+        def vol_min():
+            Tk().wm_withdraw()
+            messagebox.showwarning('ATENÇÃO', 'Volume Mínimo Alcançado')
+        def vol_max():
+            Tk().wm_withdraw()
+            messagebox.showwarning('ATENÇÃO', 'Volume Máximo Alcançado')
+
+        if vol_ef < 0:
+            vol_ef = 0
+            vol_min()
+
+        if vol_music < 0:
+            vol_music = 0
+            vol_min()
+
+        if vol_ef > 1:
+            vol_ef = 1
+            vol_max()
+
+        if vol_music > 1:
+            vol_music = 1
+            vol_max()
+
     
-        text(screen, f"{ef_txt}", 50, 480, 135, cor)
-        text(screen, f'{music_txt}', 50, 480, 188, cor)
+        #text(screen, f"{ef_txt}", 50, 480, 135, cor)
+        #text(screen, f'{music_txt}', 50, 480, 188, cor)
         
         pygame.display.flip()
 
         def vol():
             menu_music.set_volume(vol_music)
             jogo_music.set_volume(vol_music)
+            hard_music.set_volume(vol_music)
             jogar_saco.set_volume(vol_ef)
             click_music.set_volume(vol_ef)
     
@@ -523,7 +545,7 @@ def game_over():
             screen.blit(gameover_novamente_alt, (150, 580))
             if press:
                 jogo_music.stop()
-                jogo()
+                jogo(n, b)
         else:
             screen.blit(gameover_novamente, (150, 580))
 
@@ -543,30 +565,41 @@ def game_over():
 
 def faci():
     lixos.LIXOVELOCIDADE = 10
+    global b
+    b = 0
     global n
     n = 10
 
-def medi():
-    lixos.LIXOVELOCIDADE = 30
+def medi():   
+    lixos.LIXOVELOCIDADE = 16
+    buraco.LIXOVELOCIDADE = 16
+    global b
+    b = 1
     global n
-    n = 30
+    n = 16
 
 def difi():
-    lixos.LIXOVELOCIDADE = 60
+    lixos.LIXOVELOCIDADE = 22
+    buraco.LIXOVELOCIDADE = 22
+    global b
+    b = 2
     global n
-    n = 60
+    n = 22
 
-def jogo(n):
+def jogo(n, b):
     
     # objetos
     pontos = 0
-    lixomochila = 0
+    lixo_mochila = 1
     timer = 0
+    buraco_time = 0
     contagem = 60
+    collide = 0
     t = 2
     fps = 30
     j = 0
     x = 8
+    bu = b
 
     objectGroup = pygame.sprite.Group()
 
@@ -585,7 +618,9 @@ def jogo(n):
     #Lixo_group.add(lixoL)
     #Lixo_group.add(lixoR)
 
-    
+    buraco_group = pygame.sprite.Group()
+    #buraco = buraco.buraco()
+    #buraco_group.add(buraco)
 
     Player_group = pygame.sprite.Group()
     player = Player()
@@ -643,31 +678,42 @@ def jogo(n):
                 if t > 20:
                     if event.key == pygame.K_SPACE:
                         t = 0
-                        #x = 12
-                        #j = 8
+                        x = 12
+                        j = 8
                         atirar = tiro(objectGroup, tiro_group)
-                        #player.image = pygame.image.load('Imagens/sprite/l1.png')
-                        #player.current_image = (j + 1) % 12
+                        player.image = pygame.image.load('Imagens/sprite/l1.png')
+                        player.current_image = (j + 1) % 12
 
-                        if lixomochila >= 1:
+                        if lixo_mochila >= 1:
                             atirar.rect.center = player.rect.center
-                            lixomochila -= 1
-                            #player.current_image = 0
+                            lixo_mochila -= 1
+                            player.current_image = 0
                             jogar_saco.stop()
                             jogar_saco.play()
 
-                        #if t >= 4:
-                            #j = 0
-                            #x = 8
+                        if t >= 4:
+                            j = 0
+                            x = 8
 
         t += 1
         timer += 1
+        buraco_time += 1
+        collide += 1
+
+        if buraco_time == 60:
+            buraco_time = 0
+            if bu == 1:
+                buraco = buracos(objectGroup, buraco_group)
+            if bu == 2:
+                for y in range(0, 2):
+                    buraco = buracos(objectGroup, buraco_group)
         if timer == fps:
             #time.sleep(0.1)
             timer = 0
             lixol = LixoL(objectGroup, Lixo_group)
             lixor = LixoR(objectGroup, Lixo_group)
             contagem -= 1
+        
         if contagem == 0:
             game_over()
             tela = False
@@ -678,10 +724,18 @@ def jogo(n):
 
         #colisão
         if pygame.sprite.groupcollide(Lixo_group, Player_group, True, False):
-            lixomochila += 1
+            lixo_mochila += 1
 
         if pygame.sprite.groupcollide(tiro_group, Carro_group, True, False):
             pontos += 2
+        
+        if collide > 3:
+            if pygame.sprite.groupcollide(Player_group, buraco_group, False, False):
+                collide = 0
+                if lixo_mochila > 0:
+                    lixo_mochila -= 5
+                if lixo_mochila < 0:
+                    lixo_mochila = 0
 
         #Lixo_group.update()
         #Lixo_group.draw(screen)
@@ -702,10 +756,10 @@ def jogo(n):
         screen.blit(time, (655, 20))
 
         text(screen, f"{pontos}", 50, 280, 15, (238, 175, 81, 0))
-        text(screen, f"{lixomochila}", 30, 260, 80, (238, 175, 81, 0))
+        text(screen, f"{lixo_mochila}", 30, 260, 80, (238, 175, 81, 0))
         text(screen, f"{contagem}", 30, 799, 22, (238, 175, 81, 0))
 
         pygame.display.update()
-        
+
 menu()
 pygame.quit()

@@ -17,9 +17,7 @@ class LixoL(pygame.sprite.Sprite):
                     pygame.image.load('Imagens/jogo/L5.png')]
 
         self.current_image = randint(0, 4)
-        self.image = pygame.image.load('Imagens/jogo/Lixo1.png')
-        self.image = pygame.transform.scale(self.image, [69, 146])
-        self.rect = pygame.Rect(130, randint(-150, 0), 0, 0)
+        self.rect = pygame.Rect(130, randint(-150, 0), 40, 20)
 
     def update(self, *args):
         self.image = self.images[self.current_image]
@@ -38,9 +36,7 @@ class LixoR(pygame.sprite.Sprite):
                     pygame.image.load('Imagens/jogo/L5.png')]
 
         self.current_image = randint(0, 4)
-        self.image = pygame.image.load('Imagens/jogo/Lixo1.png')
-        self.image = pygame.transform.scale(self.image, [69, 146])
-        self.rect = pygame.Rect(810, randint(-150, 0), 0, 0)
+        self.rect = pygame.Rect(810, randint(-150, 0), 50, 20)
 
     def update(self, *args):
         self.image = self.images[self.current_image]
@@ -58,9 +54,7 @@ class tiro(pygame.sprite.Sprite):
                     pygame.image.load('Imagens/jogo/L5.png')]
 
         self.current_image = randint(0, 4)
-        self.image = pygame.image.load('Imagens/jogo/Lixo1.png')
-        self.image = pygame.transform.scale(self.image, [69, 146])
-        self.rect = pygame.Rect(0, 10, 100, 0)
+        self.rect = pygame.Rect(0, 10, 50, 50)
         
     def update(self, *args):
         self.image = self.images[self.current_image]

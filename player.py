@@ -22,14 +22,8 @@ class Player(pygame.sprite.Sprite):
                         pygame.image.load('Imagens/sprite/s8.png'),]
 
         self.current_image = 0
-        self.image = pygame.image.load('Imagens/jogo/boneco1.png')
-        self.image = pygame.transform.scale(self.image, [69, 146])
-        self.rect = pygame.Rect(460, 570, 100, 100)
-        
-        self.elapsed = 10
-        self.elapsed = pygame.time.get_ticks() - self.elapsed
-        #if self.elapsed < 5000: # animate every half second
-            #self.update()
+        self.rect = pygame.Rect(460, 570, 50, 50)
+    
     def update(self, v, ç):
         
         comandos = pygame.key.get_pressed()
@@ -53,8 +47,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT + 20
         if self.rect.left < 125:
             self.rect.left = 125
-        if self.rect.right > 905:
-            self.rect.right = 905
+        if self.rect.right > 860:
+            self.rect.right = 860
 
 
 class Lançar(pygame.sprite.Sprite):
