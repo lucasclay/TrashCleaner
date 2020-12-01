@@ -24,7 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.current_image = 0
         self.rect = pygame.Rect(460, 570, 50, 50)
     
-    def update(self, v, ç):
+    def update(self):
         
         comandos = pygame.key.get_pressed()
         self.current_image = (self.current_image + 1) % 8

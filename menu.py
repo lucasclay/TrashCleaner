@@ -24,7 +24,6 @@ os.environ['SDL_VIDEO_CENTERED'] = '1'
 WIDTH = 980
 HEIGHT = 720
 
-
 pygame.init()
 pygame.display.set_caption("Trash Cleaner")
 tela = pygame.display.Info()
@@ -33,7 +32,6 @@ height = tela.current_h -48
 print(width, height)
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 surface = pygame.Surface((width,height), pygame.SRCALPHA)
-
 
 screenfull = 1
 
@@ -453,12 +451,6 @@ def conf():
 def instruçoes():
     pags = 1
     screen.blit(pag1, (0, 0))
-    
-    
-    #screen.blit(pag2, (0, 0))
-    #screen.blit(pag3, (0, 0))
-    #screen.blit(pag4, (0, 0))
-    #screen.blit(pag5, (0, 0))
 
     while pygame.event.wait() or pygame.event.get():
 
@@ -549,6 +541,8 @@ def faci():
     b = 0
     global n
     n = 10
+    Tk().wm_withdraw()
+    messagebox.showinfo('ATENÇÃO', 'DIFICULDADE DEFINIDA COMO FACIL')
 
 def medi():   
     lixos.LIXOVELOCIDADE = 16
@@ -557,6 +551,8 @@ def medi():
     b = 1
     global n
     n = 16
+    Tk().wm_withdraw()
+    messagebox.showinfo('ATENÇÃO', 'DIFICULDADE DEFINIDA COMO MEDIO')
 
 def difi():
     lixos.LIXOVELOCIDADE = 22
@@ -565,12 +561,14 @@ def difi():
     b = 2
     global n
     n = 22
+    Tk().wm_withdraw()
+    messagebox.showinfo('ATENÇÃO', 'DIFICULDADE DEFINIDA COMO DIFICIL')
 
 def jogo(n, b):
     
     # objetos
     pontos = 0
-    lixo_mochila = 1
+    lixo_mochila = 50
     timer = 0
     buraco_time = 0
     contagem = 60
@@ -633,14 +631,10 @@ def jogo(n, b):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     menu()
-                if t > 20:
+                if t > 15:
                     if event.key == pygame.K_SPACE:
                         t = 0
-                        x = 12
-                        j = 8
                         atirar = tiro(objectGroup, tiro_group)
-                        player.image = pygame.image.load('Imagens/sprite/l1.png')
-                        player.current_image = (j + 1) % 12
 
                         if lixo_mochila >= 1:
                             atirar.rect.center = player.rect.center
@@ -648,10 +642,6 @@ def jogo(n, b):
                             player.current_image = 0
                             jogar_saco.stop()
                             jogar_saco.play()
-
-                        if t >= 4:
-                            j = 0
-                            x = 8
 
         t += 1
         timer += 1
@@ -696,7 +686,7 @@ def jogo(n, b):
 
         objectGroup.draw(screen)
 
-        Player_group.update(j, x)
+        Player_group.update()
         Player_group.draw(screen)
 
         Carro_group.update()
