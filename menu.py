@@ -3,7 +3,6 @@ from tkinter import *
 from tkinter import messagebox
 
 from moviepy.editor import *
-#import shelve
 
 from catador import Carro
 from player import Player
@@ -16,11 +15,9 @@ from time import sleep
 import lixos
 import buraco
 
-
 import math
 from random import randint
 import os
-
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
@@ -34,7 +31,6 @@ tela = pygame.display.Info()
 width = tela.current_w - 386
 height = tela.current_h -48
 print(width, height)
-#screen = pygame.display.set_mode((tela.current_w, tela.current_h -25)), pygame.FULLSCREEN
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 surface = pygame.Surface((width,height), pygame.SRCALPHA)
 
@@ -176,7 +172,7 @@ clip.preview()
 creditos = VideoFileClip('imagens/creditos.mp4')
 
 n = 10
-b = 10
+b = 0
 def game(n=10, b=0):
     jogo(n, b)
 
@@ -269,12 +265,6 @@ def conf():
     vol_ef = 0.5
     vol_music = 0.5
 
-    #invisivel
-    #botao[0].fill(invissible)
-    #botao[1].fill(invissible)
-    #botao[2].fill(invissible)
-    #botao[3].fill(invissible)
-
     #colocando na tela
     screen.blit(fundo_conf, (0, 0))
     pygame.draw.circle(surface, (0, 0, 0, 10), [100, 100], 7)
@@ -306,12 +296,7 @@ def conf():
     screen.blit(aplicar, (width -320, height -90))
     screen.blit(fechar, (width -140, height -90))
 
-    
-
     while pygame.event.wait() or pygame.event.get():
-    #while True:
-        fps_conf = 10
-        #clock.tick(fps_conf)
         
         mouse = pygame.mouse.get_pos()
         press = pygame.mouse.get_pressed()
@@ -371,7 +356,6 @@ def conf():
             screen.blit(seleçao, (603, 392))
             if press[0]:
                 fullscreen_on(screen)
-                #screen = pygame.display.set_mode((WIDTH, HEIGHT),pygame.FULLSCREEN)
                 conf()
                 for u in range(0, 10):
                     screen.blit(full, (601, 390))
@@ -456,10 +440,6 @@ def conf():
         if vol_music > 1:
             vol_music = 1
             vol_max()
-
-    
-        #text(screen, f"{ef_txt}", 50, 480, 135, cor)
-        #text(screen, f'{music_txt}', 50, 480, 188, cor)
         
         pygame.display.flip()
 
@@ -603,24 +583,10 @@ def jogo(n, b):
 
     objectGroup = pygame.sprite.Group()
 
-    #lixos = LixoL(objectGroup)
-    #lixos.rect.center = [100, 100]
-    #lixos2 = LixoL(objectGroup)
-    #lixos.rect.center = [200, 200]
-    #lixos3 = LixoL(objectGroup)
-    #lixos.rect.center = [300, 300]
-
-
     Lixo_group = pygame.sprite.Group()
     tiro_group = pygame.sprite.Group()
-    #lixoL = LixoL()
-    #lixoR = LixoR()
-    #Lixo_group.add(lixoL)
-    #Lixo_group.add(lixoR)
 
     buraco_group = pygame.sprite.Group()
-    #buraco = buraco.buraco()
-    #buraco_group.add(buraco)
 
     Player_group = pygame.sprite.Group()
     player = Player()
@@ -631,11 +597,6 @@ def jogo(n, b):
     Carro_group.add(carro)
 
     all_group = pygame.sprite.Group()
-    #all_group.add(player)
-    #all_group.add(carro)
-    #all_group.add(lançar)
-    #all_group.add(lixoL)
-    #all_group.add(lixoR)
 
     # Fundo
     bg = pygame.image.load('Imagens/jogo/fundosemobjetos.png').convert()
@@ -648,13 +609,10 @@ def jogo(n, b):
     # Música
 
     menu_music.stop()
-    jogo_music.play()
-
-    #game = dificul()
-    
-    #def val(vil=10):
-        #vel = vil
-        #return vel
+    if bu == 0 or bu == 1:
+        jogo_music.play()
+    else:
+        hard_music.play()
 
     val = n
     clock = pygame.time.Clock()
@@ -720,7 +678,6 @@ def jogo(n, b):
 
         # Update
         objectGroup.update()
-        #objectGroup.draw(screen)
 
         #colisão
         if pygame.sprite.groupcollide(Lixo_group, Player_group, True, False):
@@ -736,9 +693,6 @@ def jogo(n, b):
                     lixo_mochila -= 5
                 if lixo_mochila < 0:
                     lixo_mochila = 0
-
-        #Lixo_group.update()
-        #Lixo_group.draw(screen)
 
         objectGroup.draw(screen)
 
